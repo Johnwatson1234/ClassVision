@@ -36,7 +36,7 @@ pip install -r requirements.txt
 hypercorn --bind 127.0.0.1:8000 app:app
 ```
 
-启动成功后访问：
+启动成功后访问：  
 - http://127.0.0.1:8000
 
 > 注意：Flask 自带开发服务器是 WSGI，不原生支持 WebSocket；请使用 `hypercorn`（或 `gunicorn` + gevent/eventlet 等）以启用 WebSocket。
@@ -89,3 +89,39 @@ hypercorn --bind 127.0.0.1:8000 app:app
 - 增加鉴权（例如使用 Cookie/Token 进行认证）。
 - 增加分组/多路复用（使用不同 `series` 或频道）。
 - 使用消息队列或缓存中间层（如 Redis）实现多实例广播。
+
+
+
+# YOLO11 流式推理（Flask）+ WebSocket(JSON) + MJPEG 重绘
+
+## 安装
+```bash
+pip install -r server/requirements.txt
+```
+
+## 配置
+编辑 `server/app.py` 顶部：
+- `MODEL_PATH` 你的 YOLO11 权重路径
+- `SOURCE` 输入源（文件/摄像头索引/RTSP）
+- `TRACKER_CFG` 跟踪器配置（默认 `botsort.yaml`）
+- 根据需要调整 `INFERENCE_INTERVAL_SEC / CONF_THRES / IOU_THRES`
+
+## 运行
+```bash
+python server/app.py
+```
+
+## 访问
+- 演示页面（视频+叠加+WS日志）：http://localhost:8000/
+- MJPEG 处理后视频（仅画面）：http://localhost:8000/video.mjpg
+- WebSocket JSON：ws://localhost:8000/ws
+- 健康检查：http://localhost:8000/health
+- 配置回显：http://localhost:8000/config
+
+## 前端集成方式
+- 建议：用 `/video.mjpg` 作为视频画面，WebSocket(JSON) 仅承载元数据（框、ID、置信度）；在前端 canvas 覆盖绘制，实现“处理后视频”的重绘。
+- 如果你希望完全只通过 WebSocket 传输（不走 MJPEG），可把 `INCLUDE_IMAGE_IN_JSON = True`，后端会在 JSON 中附带当前帧的 `image_jpeg_base64`，前端解码后绘制；但带宽和延迟会明显增大。
+
+## 其它
+- 当前示例在后台线程中以“抽帧”方式进行跟踪推理，能显著降低 GPU/CPU 压力。将 `INFERENCE_INTERVAL_SEC` 设为更小值可接近逐帧推理。
+- 若前端较多，MJPEG 更省带宽；需要更低延迟/更高质量可后续切换 WebRTC/RTSP/LL-HLS 承载视频，WS 继续承载元数据。
