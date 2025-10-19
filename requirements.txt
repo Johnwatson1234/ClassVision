@@ -1,0 +1,4 @@
+Flask>=2.3
+Flask-Sock>=0.7.0
+simple-websocket>=1.0.0
+hypercorn>=0.14.0

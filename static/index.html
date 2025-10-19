@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>ECharts WebSocket 实时数据示例</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="./styles.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  </head>
+  <body>
+    <div class="toolbar">
+      <div class="control">
+        <label for="interval">推送间隔(ms):</label>
+        <input id="interval" type="number" min="50" max="10000" step="50" value="1000" />
+        <button id="apply-interval">应用</button>
+      </div>
+      <div class="control">
+        <label for="series">序列名:</label>
+        <input id="series" type="text" value="random" maxlength="32" />
+        <button id="apply-series">应用</button>
+      </div>
+      <div class="status">
+        状态: <span id="status">未连接</span>
+      </div>
+    </div>
+
+    <div id="chart" class="chart"></div>
+
+    <script src="./main.js"></script>
+  </body>
+</html>
